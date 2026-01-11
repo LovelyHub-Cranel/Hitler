@@ -1,3 +1,4 @@
+start
 -- LocalScript (put in StarterPlayerScripts or StarterGui)
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
