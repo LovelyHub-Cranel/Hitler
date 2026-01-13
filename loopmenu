@@ -1,0 +1,21 @@
+Save = true,
+    Flag = "perspectivevisualeffect_dropdown"
+})
+local loopPlayersSection = loopPlayersTab:AddSection({
+    Name = "Loop Players"
+})
+local playersInLoopSection = loopPlayersTab:AddSection({
+    Name = "Players in Loop"
+})
+local loopKillFunctionsSection = loopPlayersTab:AddSection({
+    Name = "Loop Kill Functions"
+})
+local loopKickSection = loopPlayersTab:AddSection({
+    Name = "Loop Kick (Blobman)"
+})
+local selectPlayerDropdown = loopPlayersSection:AddDropdown({
+    Name = "Select Player",
+    Default = "",
+    Options = {
+        ""
+    },
