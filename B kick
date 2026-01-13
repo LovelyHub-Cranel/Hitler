@@ -1,0 +1,49 @@
+local loopKick = loopPlayersTab:AddSection({
+    Name = "Loop Kick"
+})
+loopkick = loopKick:AddToggle({
+    Name = "Loop Kick",
+    Default = false,
+                playerCFrame = GetPlayerCFrame()
+                local pairsIterator, pairsIterator4, playerIndex = pairs(playerList)
+                while true do
+                    local playerName
+                    playerIndex, playerName = pairsIterator(pairsIterator4, playerIndex)
+                    if playerIndex == nil then
+                        break
+                    end
+                    local playerInstance = playersService:FindFirstChild(playerName)
+                    if CheckPlayerForLoopKill(playerInstance) and ChangeActivityPriority(2) then
+                        local playerHumanoidRootPart = playerInstance.Character:FindFirstChild("HumanoidRootPart")
+                        local headPart2 = playerInstance.Character:FindFirstChild("Head")
+                        playerInstance.Character:FindFirstChild("Humanoid")
+                        if playerInstance and (playerHumanoidRootPart and headPart2) then
+                            for _ = 0, 50 do
+                                dialogueFunction2()
+                                SNOWship(playerHumanoidRootPart)
+                                if not CheckPlayerForLoopKill(playerInstance) or (not _G.LoopKickOwnership or (CheckNetworkOwnerShipOnPlayer(playerInstance) or playerHumanoidRootPart.AssemblyLinearVelocity.Magnitude > 500)) then
+                                    destroyGrabLineEvent:FireServer(playerHumanoidRootPart)
+                                    wait()
+                                    CreateSkyVelocity(playerHumanoidRootPart)
+                                    break
+                                end
+                                task.wait()
+                                if playerHumanoidRootPart.Position.Y <= - 12 then
+                                    TeleportPlayer(CFrame.new(playerHumanoidRootPart.Position + Vector3.new(0, 5, - 15)), 2)
+                                else
+                                    TeleportPlayer(CFrame.new(playerHumanoidRootPart.Position + Vector3.new(0, - 10, - 10)), 2)
+                                end
+                            end
+                        end
+                        ChangeActivityPriority(0)
+                    end
+                end
+                TeleportPlayer(playerCFrame)
+                task.wait(0.2)
+            end
+            dialogueFunction1()
+            TeleportPlayer(playerCFrame)
+        end
+    end,
+    Save = true,
+    Flag = "lkick_toggle"
