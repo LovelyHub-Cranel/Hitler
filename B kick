@@ -48,3 +48,15 @@ loopkick = loopKick:AddToggle({
     Save = true,
     Flag = "lkick_toggle"
  })
+loopKickSection:AddDropdown({
+    Name = "Kick Type",
+    Default = "Go to the heaven!",
+    Options = {
+        "Go to the heaven!"
+    },
+    Callback = function(loopKickOwnerType)
+        _G.LoopKickType = loopKickType
+    end,
+    Save = true,
+    Flag = "loopkicktype_dropdown"
+})
