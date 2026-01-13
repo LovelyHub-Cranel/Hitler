@@ -71,3 +71,6 @@ local antiGucciConnection
 		local trainFolder = workspace.Map.AlwaysHereTweenedObjects
 		if trainFolder and trainFolder:FindFirstChild("Train") then ResetPlayer(game.Players.LocalPlayer) end
 end
+
+local DefenseGroup = Tabs.Defense:AddLeftGroupbox("Defense Main")
+	local DefenseExtra = Tabs.Defense:AddRightGroupbox("Extra Defense")
