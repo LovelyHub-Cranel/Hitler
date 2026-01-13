@@ -1,0 +1,76 @@
+TargetGroup:AddToggle("LoopKillToggle", {
+		Text = "Loop kill",
+		Default = false,
+		Callback = function(on)
+			loopKillEnabled = on
+			if on then
+				local target = selectedKickPlayer
+				if not target then 
+					notify("System", "Select target first", 3)
+					Toggles.LoopKickToggle:SetValue(false)
+					return 
+				end
+
+				task.spawn(function()
+					local RS = game:GetService("ReplicatedStorage")
+					local RunService = game:GetService("RunService")
+					local GE = RS:WaitForChild("GrabEvents")
+					
+					while loopKillEnabled do
+						if not target or not target.Parent or not target.Character then
+							loopKillEnabled = false
+							Toggles.LoopKillToggle:SetValue(false)
+							break
+						end
+
+						local myChar = Player.Character
+						local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+						
+						local tChar = target.Character
+						local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+						local tHum = tChar and tChar:FindFirstChild("Humanoid")
+
+						if tRoot and tHum and tHum.Health > 0 and myRoot then
+							
+							local currentPos = myRoot.CFrame
+
+							local attackStart = tick()
+							while tick() - attackStart < 0.35 do
+								if not loopKillEnabled or not tRoot.Parent then break end
+								
+								myRoot.CFrame = tRoot.CFrame * CFrame.new(0, 0, 2)
+								myRoot.Velocity = Vector3.zero
+								
+								pcall(function()
+									GE.SetNetworkOwner:FireServer(tRoot, myRoot.CFrame)
+									
+									tHum:ChangeState(Enum.HumanoidStateType.Dead)
+									tHum.Health = 0
+									
+									GE.CreateGrabLine:FireServer(tRoot, Vector3.zero, tRoot.Position, false)
+									GE.DestroyGrabLine:FireServer(tRoot)
+								end)
+								
+								RunService.Heartbeat:Wait()
+							end
+							
+							if myRoot then
+								myRoot.CFrame = currentPos
+								myRoot.Velocity = Vector3.zero
+							end
+							
+							task.wait(1.2) 
+						else
+							task.wait(0.5)
+						end
+					end
+					
+					local char = Player.Character
+					local root = char and char:FindFirstChild("HumanoidRootPart")
+					if root then root.Velocity = Vector3.zero end
+				end)
+			else
+				loopKillEnabled = false
+			end
+		end
+	})
