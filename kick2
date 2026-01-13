@@ -1,0 +1,93 @@
+local loopKickDualActive = false
+	TargetGroup:AddToggle("DualHandLoopKick", {
+		Text = "Loop Kick",
+		Default = false,
+		Callback = function(on)
+			loopKickDualActive = on
+			if on then
+				if not selectedKickPlayer then 
+					notify("Error", "Select target first", 3)
+					Toggles.DualHandLoopKick:SetValue(false)
+					return 
+				end
+
+				task.spawn(function()
+					local lastTargetCharDual = nil
+					local bp = nil
+
+					while loopKickDualActive do
+						local target = selectedKickPlayer
+						local char = Player.Character
+						local hum = char and char:FindFirstChild("Humanoid")
+						local seat = hum and hum.SeatPart
+						
+						if not seat or not target or not target.Parent then
+							task.wait(0.5)
+							continue
+						end
+
+						local seatParent = seat.Parent
+						local grab = seatParent:FindFirstChild("BlobmanSeatAndOwnerScript") and seatParent.BlobmanSeatAndOwnerScript:FindFirstChild("CreatureGrab")
+						local drop = seatParent:FindFirstChild("BlobmanSeatAndOwnerScript") and seatParent.BlobmanSeatAndOwnerScript:FindFirstChild("CreatureDrop")
+						
+						if not grab or not drop then task.wait(0.5) continue end
+
+						local leftDet = seatParent:FindFirstChild("LeftDetector")
+						local rightDet = seatParent:FindFirstChild("RightDetector")
+						local leftWeld = leftDet and leftDet:FindFirstChild("LeftWeld")
+						local rightWeld = rightDet and rightDet:FindFirstChild("RightWeld")
+
+						local hrp = char:FindFirstChild("HumanoidRootPart")
+						
+						local targetChar = target.Character
+						local targetHRP = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+						local targetHum = targetChar and targetChar:FindFirstChild("Humanoid")
+
+						if targetHRP and targetHum and targetHum.Health > 0 then
+							if targetChar ~= lastTargetCharDual then
+								lastTargetCharDual = targetChar
+								if bp then bp:Destroy() bp = nil end
+								if hrp then hrp.CFrame = targetHRP.CFrame * CFrame.new(0, 25, 0) end
+								task.wait(0.2)
+								grab:FireServer(leftDet, targetHRP, leftWeld)
+								task.wait(0.3)
+								drop:FireServer(leftWeld, targetHRP)
+								task.wait(0.1)
+								bp = Instance.new("BodyPosition")
+								bp.Position = Vector3.new(0, 999999, 0)
+								bp.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+								bp.Parent = targetHRP
+								grab:FireServer(leftDet, targetHRP, leftWeld)
+								task.wait(0.2)
+								drop:FireServer(leftWeld, targetHRP)
+							end
+
+							grab:FireServer(leftDet, targetHRP, leftWeld)
+							task.wait()
+							drop:FireServer(leftWeld, targetHRP)
+							task.wait()
+							grab:FireServer(rightDet, targetHRP, rightWeld)
+							task.wait()
+							drop:FireServer(rightWeld, targetHRP)
+							task.wait()
+							grab:FireServer(leftDet, targetHRP, leftWeld)
+							grab:FireServer(rightDet, targetHRP, rightWeld)
+							task.wait()
+							drop:FireServer(leftWeld, targetHRP)
+							drop:FireServer(rightWeld, targetHRP)
+							task.wait()
+						else
+							task.wait(0.1)
+						end
+					end
+					if bp then bp:Destroy() end
+				end)
+			else
+				loopKickDualActive = false
+			end
+		end
+	})
+
+	local playerFlingActive = false
+	local flingBAV = nil
+	local originalPos = nil
