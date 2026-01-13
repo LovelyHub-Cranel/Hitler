@@ -1,0 +1,116 @@
+TargetGroup:AddButton({
+    Text = "bring",
+    Func = function()
+        if not selectedKickPlayer then 
+            return 
+        end
+
+        local char = Player.Character
+        local hum = char and char:FindFirstChild("Humanoid")
+        local seat = hum and hum.SeatPart
+        if not seat or seat.Parent.Name ~= "CreatureBlobman" then 
+            return 
+        end
+
+        local blob = seat.Parent
+        local blobRoot = blob:FindFirstChild("HumanoidRootPart")
+        local scriptObj = blob:FindFirstChild("BlobmanSeatAndOwnerScript")
+        if not blobRoot or not scriptObj then return end
+
+        local CG = scriptObj:FindFirstChild("CreatureGrab")
+        local CD = scriptObj:FindFirstChild("CreatureDrop")
+        local R_Det = blob:FindFirstChild("RightDetector")
+        local R_Weld = R_Det and R_Det:FindFirstChild("RightWeld")
+
+        local tChar = selectedKickPlayer.Character
+        local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+        if not tRoot then return end
+
+        local home = blobRoot.CFrame
+
+        blobRoot.CFrame = tRoot.CFrame
+        blobRoot.Velocity = Vector3.new()
+        blobRoot.RotVelocity = Vector3.new()
+        task.wait(0.3)
+
+        pcall(function()
+            CG:FireServer(R_Det, tRoot, R_Weld)
+        end)
+
+        task.wait(0.5)
+
+        blobRoot.CFrame = home
+        blobRoot.Velocity = Vector3.new()
+        blobRoot.RotVelocity = Vector3.new()
+
+        task.wait(0.05)
+
+        for i = 1, 12 do
+            tRoot.CFrame = home * CFrame.new(0,3,0)
+            tRoot.Velocity = Vector3.new()
+            tRoot.RotVelocity = Vector3.new()
+            task.wait(0.03)
+        end
+
+        for i = 1, 8 do
+            local weld = R_Det:FindFirstChild("RightWeld")
+            if weld then
+                pcall(function()
+                    CD:FireServer(weld)
+                end)
+            end
+            task.wait(0.03)
+        end
+    end
+})
+
+	local antiAntiKickActive = false
+TargetGroup:AddToggle("DestroyAntiKickToggle", {
+		Text = "Grab Anti Kick",
+		Default = false,
+		Callback = function(Value)
+			antiAntiKickActive = Value
+
+			if Value then
+				task.spawn(function()
+					local SetNetOwner = game:GetService("ReplicatedStorage").GrabEvents.SetNetworkOwner
+					local LocalPlayer = game.Players.LocalPlayer
+
+					local function invis_touch(part, cf)
+						SetNetOwner:FireServer(part, cf)
+					end
+
+					local function CheckAndYeet(toy)
+						local part = toy:FindFirstChild("SoundPart")
+						if part then
+							invis_touch(part, part.CFrame)
+							if part:FindFirstChild("PartOwner") and part.PartOwner.Value == LocalPlayer.Name then
+								part.CFrame = CFrame.new(0, 1000, 0)
+							end
+						end
+					end
+
+					while antiAntiKickActive do
+						local target = selectedKickPlayer
+						if target then
+							local spawned = workspace:FindFirstChild(target.Name.."SpawnedInToys")
+							if spawned then
+								if spawned:FindFirstChild("NinjaKunai") then
+									CheckAndYeet(spawned.NinjaKunai)
+								end
+								if spawned:FindFirstChild("NinjaShuriken") then
+									CheckAndYeet(spawned.NinjaShuriken)
+								end
+								if spawned:FindFirstChild("AntiKick") then
+									CheckAndYeet(spawned.AntiKick)
+								end
+							end
+						end
+						task.wait(0.1)
+					end
+				end)
+			else
+				antiAntiKickActive = false
+			end
+		end
+	})
