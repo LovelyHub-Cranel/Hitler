@@ -1,0 +1,57 @@
+local playerCFrame = nil
+loopKillFunctionsSection:AddToggle({
+    Name = "Loop Kill",
+    Default = false,
+    Callback = function(loopKill)
+        _G.LoopKill = loopKill
+        if loopKill then
+            while _G.LoopKill do
+                playerCFrame = GetPlayerCFrame()
+                local index5, playerValue5, playerKey5 = pairs(playerList)
+                while true do
+                    local playerName5
+                    playerKey5, playerName5 = index5(playerValue5, playerKey5)
+                    if playerKey5 == nil then
+                        break
+                    end
+                    local playerInstance3 = playersService:FindFirstChild(playerName5)
+                    if CheckPlayerForLoopKill(playerInstance3) and ChangeActivityPriority(2) then
+                        local humanoidRootPart = playerInstance3.Character:FindFirstChild("HumanoidRootPart")
+                        local headPart = playerInstance3.Character:FindFirstChild("Head")
+                        local characterHumanoid = playerInstance3.Character:FindFirstChild("Humanoid")
+                        if playerInstance3 and (humanoidRootPart and headPart) then
+                            for _ = 0, 50 do
+                                dialogueFunction2()
+                                SNOWship(humanoidRootPart)
+                                if not CheckPlayerForLoopKill(playerInstance3) or (not _G.LoopKill or (CheckNetworkOwnerShipOnPlayer(playerInstance3) or humanoidRootPart.AssemblyLinearVelocity.Magnitude > 500)) then
+                                    destroyGrabLineEvent:FireServer(humanoidRootPart)
+                                    CreateSkyVelocity(humanoidRootPart)
+                                    break
+                                end
+                                task.wait()
+                                if humanoidRootPart.Position.Y <= - 12 then
+                                    TeleportPlayer(CFrame.new(humanoidRootPart.Position + Vector3.new(0, 5, - 15)), 2)
+                                else
+                                    TeleportPlayer(CFrame.new(humanoidRootPart.Position + Vector3.new(0, - 10, - 10)), 2)
+                                end
+                                characterHumanoid.BreakJointsOnDeath = false
+                                characterHumanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                characterHumanoid.Jump = true
+                                characterHumanoid.Sit = false
+                            end
+                        end
+                        ChangeActivityPriority(0)
+                    end
+                end
+                TeleportPlayer(playerCFrame)
+                task.wait(0.2)
+            end
+            dialogueFunction1()
+            TeleportPlayer(playerCFrame)
+            print("End LoopKill")
+                print("ts was renamed by itsjose4")
+        end
+    end,
+    Save = true,
+    Flag = "lk_toggle"
+})
