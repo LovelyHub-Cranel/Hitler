@@ -1,0 +1,25 @@
+local function sendHubLoadedMessage()
+		local message = "Lovely-End "
+		local sent = false
+		pcall(function()
+			local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+			if chatEvents then
+				local say = chatEvents:FindFirstChild("SayMessageRequest")
+				if say and typeof(say.FireServer) == "function" then
+					say:FireServer(message, "All")
+					sent = true
+				end
+			end
+		end)
+		if not sent then
+			pcall(function()
+				StarterGui:SetCore("ChatMakeSystemMessage", {
+					Text = message;
+					Color = Color3.fromRGB(255, 170, 0);
+					Font = Enum.Font.SourceSansBold;
+					FontSize = Enum.FontSize.Size18;
+				})
+			end)
+		end
+	end
+	task.spawn(function() task.wait(1) sendHubLoadedMessage() end)
