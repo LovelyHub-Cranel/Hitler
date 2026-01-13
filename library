@@ -15,7 +15,7 @@ local Players = game:GetService("Players")
 	Library.ForceCheckbox = false
 
 	local Window = Library:CreateWindow({
-		Title = "☣️ VaB",
+		Title = "Lonely-Hub",
 		Footer = "Made by VaBlox",
 		NotifySide = "Right",
 		ShowCustomCursor = true,
