@@ -47,3 +47,4 @@ loopkick = loopKick:AddToggle({
     end,
     Save = true,
     Flag = "lkick_toggle"
+ })
