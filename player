@@ -1,0 +1,149 @@
+local selectPlayerDropdown = loopPlayersSection:AddDropdown({
+    Name = "Select Player",
+    Default = "",
+    Options = {
+        ""
+    },
+    Callback = function(playerNameToAdd)
+        if playerNameToAdd then
+            _G.PlayerToAdd = string.split(playerNameToAdd, " ")[1]
+        end
+    end
+})
+local unknownValue = nil
+local maxPlayersInLoop = GetKey() ~= "Xana" and 3 or 999999
+loopPlayersSection:AddButton({
+    Name = "Add",
+    Callback = function()
+        if not table.find(playerList, _G.PlayerToAdd) then
+            if maxPlayersInLoop <= # playerList then
+                showNotification("You reached the max ammount of players in loop, buy premium to unlock more space!")
+            else
+                table.insert(playerList, _G.PlayerToAdd)
+                refreshStringList(unknownValue, playerList)
+            end
+        end
+    end
+})
+local playersInLoopDropdown = playersInLoopSection:AddDropdown({
+    Name = "Players in Loop",
+    Default = "",
+    Options = {
+        ""
+    },
+    Callback = function(playerNameToRemove)
+        _G.PlayerToRemove = playerNameToRemove
+    end
+})
+playersInLoopSection:AddButton({
+    Name = "Remove",
+    Callback = function()
+        local index, playerValue, playerKey = pairs(playerList)
+        while true do
+            local playerName
+            playerKey, playerName = index(playerValue, playerKey)
+            if playerKey == nil then
+                break
+            end
+            if playerName == _G.PlayerToRemove then
+                playerList[playerKey] = nil
+            end
+        end
+        refreshStringList(playersInLoopDropdown, playerList)
+    end
+})
+local function checkBlobmanSeat()
+    if typeof(_G.LastBlobmanWasSeat) ~= "Instance" or not _G.LastBlobmanWasSeat.Parent then
+        _G.LastBlobmanWasSeat = getLastBlobmanSeat()
+    else
+        local playerCharacter = GetPlayerCharacter()
+        local lastBlobmanSeat = _G.LastBlobmanWasSeat:FindFirstChild("VehicleSeat")
+        if not (lastBlobmanSeat and lastBlobmanSeat:FindFirstChild("ProximityPrompt")) then
+            DeleteToyRE:FireServer(_G.LastBlobmanWasSeat)
+            return
+        end
+        local proximityPrompt = lastBlobmanSeat.ProximityPrompt
+        local vehicleWeld = lastBlobmanSeat:FindFirstChildOfClass("Weld")
+        if localPlayer:DistanceFromCharacter(lastBlobmanSeat.Position) >= 150 then
+            DeleteToyRE:FireServer(_G.LastBlobmanWasSeat)
+            return
+        end
+        if playerCharacter and (vehicleWeld and vehicleWeld.Part1) and not vehicleWeld.Part1:IsDescendantOf(playerCharacter) then
+            local part1 = vehicleWeld.Part1
+            local unknownValue2 = playersService
+            SNOWshipPlayer(unknownValue2:GetPlayerFromCharacter(part1.Parent))
+        end
+        if proximityPrompt and lastBlobmanSeat then
+            for _ = 0, 15 do
+                if isPlayerSeatedInBlobman() or not _G.LoopKick then
+                    break
+                end
+                fireproximityprompt(proximityPrompt)
+                TeleportPlayer(lastBlobmanSeat.CFrame + Vector3.new(0, 3.5, 0), 1.5)
+                task.wait(0.1)
+            end
+        end
+    end
+end
+function CountRealNumberPlayersInLoop()
+    local index2, pairsIterator1, playerKey2 = pairs(playerList)
+    local counter = 0
+    while true do
+        local playerName2
+        playerKey2, playerName2 = index2(pairsIterator1, playerKey2)
+        if playerKey2 == nil then
+            break
+        end
+        if playersService:FindFirstChild(playerName2) then
+            counter = counter + 1
+        end
+    end
+    return counter
+end
+function IsThereAnyPlayersInLoopAlive()
+    local index3, pairsIterator2, playerKey3 = pairs(playerList)
+    local someBooleanValue = false
+    while true do
+        local playerInstance
+        playerKey3, playerInstance = index3(pairsIterator2, playerKey3)
+        if playerKey3 == nil then
+            break
+        end
+        if playersService:FindFirstChild(playerInstance) and playerInstance.Character then
+            if playerInstance.Character:FindFirstChildOfClass("Humanoid") and playerInstance.Character.Humanoid.Health > 0 then
+                someBooleanValue = true
+            end
+        end
+    end
+    return someBooleanValue
+end
+function ResetCharacterStats()
+    local index4, pairsIterator3, playerKey4 = pairs(playerList)
+    while true do
+        local playerName4
+        playerKey4, playerName4 = index4(pairsIterator3, playerKey4)
+        if playerKey4 == nil then
+            break
+        end
+        local playerInstance2 = playersService:FindFirstChild(playerName4)
+        if playerInstance2 and playerInstance2.Character and playerInstance2.Character:FindFirstChild("HumanoidRootPart") then
+            local characterHumanoidRootPart = playerInstance2.Character.HumanoidRootPart
+            playerInstance2.Character:SetAttribute("Kick", 0)
+            playerInstance2.Character:SetAttribute("Kicking", nil)
+            playerInstance2.Character:SetAttribute("Kicking2", nil)
+            if characterHumanoidRootPart:FindFirstChild("KickAuraVelocity") then
+                characterHumanoidRootPart.KickAuraVelocity:Destroy()
+            end
+        end
+    end
+end
+function verifyPlayerinBlobmanHand()
+    local characterHumanoid = localPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if isPlayerSeatedInBlobman() then
+        local leftWeldAttachment = characterHumanoid.SeatPart.Parent:WaitForChild("LeftDetector"):WaitForChild("LeftWeld").Attachment0
+        local playerFromPart = leftWeldAttachment and leftWeldAttachment.Parent and playersService:GetPlayerFromCharacter(leftWeldAttachment.Parent.Parent)
+        if playerFromPart then
+            return playerFromPart
+        end
+    end
+end
