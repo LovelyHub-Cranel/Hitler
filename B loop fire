@@ -1,0 +1,41 @@
+loopFire = loopKillFunctionsSection:AddToggle({
+    Name = "Loop Fire",
+    Default = false,
+    Callback = function(loopFireEnabled)
+        _G.LoopFire = loopFireEnabled
+        if loopFireEnabled then
+            while _G.LoopFire do
+                if GetKey() ~= "Xana" then
+                    loopFire:Set(false)
+                    _G.LoopFire = false
+                    showNotification("Only for premium users! Buy premium in my discord server!")
+                    break
+                end
+                local pairsIteratorFire, iteratorStateFire, playerIndexFire = pairs(playerList)
+                while true do
+                    local playerNameFire
+                    playerIndexFire, playerNameFire = pairsIteratorFire(iteratorStateFire, playerIndexFire)
+                    if playerIndexFire == nil then
+                        break
+                    end
+                    local playerInstanceFire = playersService:FindFirstChild(playerNameFire)
+                    if CheckPlayerAnnoyAll(playerInstanceFire) then
+                        local _ = playerInstanceFire.Character
+                        local playerHumanoidRootPartFire = playerInstanceFire.Character:FindFirstChild("HumanoidRootPart")
+                        local canBurnValue
+                        if playerHumanoidRootPartFire:FindFirstChild("FirePlayerPart") and playerHumanoidRootPartFire.FirePlayerPart:FindFirstChild("CanBurn") then
+                            canBurnValue = playerHumanoidRootPartFire.FirePlayerPart.CanBurn.Value
+                        else
+                            canBurnValue = nil
+                        end
+                        if playerHumanoidRootPartFire and (playerInstanceFire and not (IsPlayerInsideSafeZone(playerInstanceFire) or canBurnValue)) then
+                            handleCampfireTouch(playerHumanoidRootPartFire)
+                            task.wait(0.015)
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end
+    end
+})
