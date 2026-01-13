@@ -1,0 +1,73 @@
+local antiGucciConnection
+	local safePosition
+	local restoreFrames = 0
+	local function spawnBlobman()
+		local args = {[1] = "CreatureBlobman", [2] = CFrame.new(0, 5000000, 0), [3] = Vector3.new(0, 60, 0)}
+		pcall(function() ReplicatedStorage.MenuToys.SpawnToyRemoteFunction:InvokeServer(unpack(args)) end)
+		local folder = Workspace:WaitForChild(Player.Name.."SpawnedInToys", 5)
+		if folder and folder:FindFirstChild("CreatureBlobman") then
+			local blob = folder.CreatureBlobman
+			if blob:FindFirstChild("Head") then blob.Head.CFrame = CFrame.new(0, 50000, 0) blob.Head.Anchored = true end
+			notify("Success", "Blobman Spawned!", 3)
+		end
+	end
+	local function startAntiGucci()
+		local character = Player.Character or Player.CharacterAdded:Wait()
+		local humanoid = character:WaitForChild("Humanoid")
+		local rootPart = character:WaitForChild("HumanoidRootPart")
+		safePosition = rootPart.Position
+		local folder = Workspace:FindFirstChild(Player.Name.."SpawnedInToys")
+		local blob = folder and folder:FindFirstChild("CreatureBlobman")
+		local seat = blob and blob:FindFirstChild("VehicleSeat")
+		if not blob then spawnBlobman() task.wait(1) folder = Workspace:FindFirstChild(Player.Name.."SpawnedInToys") blob = folder and folder:FindFirstChild("CreatureBlobman") seat = blob and blob:FindFirstChild("VehicleSeat") end
+		if seat and seat:IsA("VehicleSeat") then rootPart.CFrame = seat.CFrame + Vector3.new(0, 2, 0) seat:Sit(humanoid) end
+		humanoid:GetPropertyChangedSignal("Jump"):Connect(function() if humanoid.Jump and humanoid.Sit then restoreFrames = 15 safePosition = rootPart.Position end end)
+		if antiGucciConnection then antiGucciConnection:Disconnect() end
+		antiGucciConnection = R.Heartbeat:Connect(function()
+			if not rootPart or not humanoid then return end
+			ReplicatedStorage.CharacterEvents.RagdollRemote:FireServer(rootPart, 0)
+			if restoreFrames > 0 then rootPart.CFrame = CFrame.new(safePosition) restoreFrames = restoreFrames - 1 end
+		end)
+		task.spawn(function() while humanoid.Sit do task.wait(1) end task.wait(0.5) rootPart.CFrame = CFrame.new(safePosition) end)
+	end
+	local function stopAntiGucci()
+		if antiGucciConnection then antiGucciConnection:Disconnect() antiGucciConnection = nil end
+		local blobFolder = Workspace:FindFirstChild(Player.Name.."SpawnedInToys")
+		if blobFolder and blobFolder:FindFirstChild("CreatureBlobman") then blobFolder.CreatureBlobman:Destroy() end
+	end
+
+	local antiGucciConnectionTrain
+	local safePositionTrain
+	local restoreFramesTrain = 0
+	local function startAntiGucciTrain()
+		local character = Player.Character or Player.CharacterAdded:Wait()
+		local humanoid = character:WaitForChild("Humanoid")
+		local rootPart = character:WaitForChild("HumanoidRootPart")
+		safePositionTrain = rootPart.Position
+		local folder = workspace.Map.AlwaysHereTweenedObjects
+		local train = folder and folder:FindFirstChild("Train")
+		local seat
+		if train then
+	    	for _, d in ipairs(train:GetDescendants()) do
+ 	       	if d:IsA("Seat") then
+  	      	    seat = d
+  	       	   break
+ 	     	  end
+	  	  end
+		end
+
+		if seat then rootPart.CFrame = seat.CFrame + Vector3.new(0, 2, 0) seat:Sit(humanoid) end
+		humanoid:GetPropertyChangedSignal("Jump"):Connect(function() if humanoid.Jump and humanoid.Sit then restoreFramesTrain = 15 safePositionTrain = rootPart.Position end end)
+		if antiGucciConnectionTrain then antiGucciConnectionTrain:Disconnect() end
+		antiGucciConnectionTrain = R.Heartbeat:Connect(function()
+			if not rootPart or not humanoid then return end
+			ReplicatedStorage.CharacterEvents.RagdollRemote:FireServer(rootPart, 0)
+			if restoreFramesTrain > 0 then rootPart.CFrame = CFrame.new(safePositionTrain) restoreFramesTrain = restoreFramesTrain - 1 end
+		end)
+		task.spawn(function() while humanoid.Sit do task.wait(1) end task.wait(0.5) rootPart.CFrame = CFrame.new(safePositionTrain) end)
+	end
+	local function stopAntiGucciTrain()
+		if antiGucciConnectionTrain then antiGucciConnectionTrain:Disconnect() antiGucciConnectionTrain = nil end
+		local trainFolder = workspace.Map.AlwaysHereTweenedObjects
+		if trainFolder and trainFolder:FindFirstChild("Train") then ResetPlayer(game.Players.LocalPlayer) end
+end
