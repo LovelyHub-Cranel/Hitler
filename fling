@@ -1,0 +1,122 @@
+TargetGroup:AddToggle("PlayerFlingBtn", {
+		Text = "Fling",
+		Default = false,
+		Callback = function(on)
+			playerFlingActive = on
+			
+			if on then
+				if not selectedKickPlayer then
+					notify("System", "Select target first!", 3)
+					Toggles.PlayerFlingBtn:SetValue(false)
+					return
+				end
+				
+				local RunService = game:GetService("RunService")
+				local MyChar = Player.Character
+				local MyRoot = MyChar and MyChar:FindFirstChild("HumanoidRootPart")
+				
+				if MyRoot then originalPos = MyRoot.CFrame end
+				
+				notify("Maestro", "Fling Mode Activated. DO NOT MOVE.", 3)
+
+				task.spawn(function()
+					while playerFlingActive do
+						local target = selectedKickPlayer
+						
+						local char = Player.Character
+						local hrp = char and char:FindFirstChild("HumanoidRootPart")
+						local hum = char and char:FindFirstChild("Humanoid")
+						
+						if not hrp or not hum then 
+							task.wait(0.5) 
+							continue 
+						end
+						
+						if target and target.Parent then
+							local tChar = target.Character
+							local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+							local tHum = tChar and tChar:FindFirstChild("Humanoid")
+							
+							if tRoot and tHum and tHum.Health > 0 then
+								
+								if not flingBAV or flingBAV.Parent ~= hrp then
+									if flingBAV then flingBAV:Destroy() end
+									flingBAV = Instance.new("BodyAngularVelocity")
+									flingBAV.Name = "MaestroSpin"
+									flingBAV.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+									flingBAV.AngularVelocity = Vector3.new(0, 10000, 0)
+									flingBAV.P = 10000
+									flingBAV.Parent = hrp
+								end
+								
+								for _, part in pairs(char:GetDescendants()) do
+									if part:IsA("BasePart") then
+										part.CanCollide = false
+									end
+								end
+								
+								local loop = RunService.Heartbeat:Connect(function()
+									if not playerFlingActive or not tRoot or not tRoot.Parent then return end
+									hrp.CFrame = tRoot.CFrame
+									hrp.Velocity = Vector3.zero 
+								end)
+								
+								local startTime = tick()
+								while tick() - startTime < 1.5 do
+									if not playerFlingActive or not tRoot.Parent then break end
+									task.wait(0.1)
+								end
+								
+								if loop then loop:Disconnect() end
+								
+							else
+								task.wait(0.2)
+							end
+						else
+							playerFlingActive = false
+							Toggles.PlayerFlingBtn:SetValue(false)
+						end
+						
+						task.wait(0.1)
+					end
+					
+					if flingBAV then flingBAV:Destroy() flingBAV = nil end
+					
+					local char = Player.Character
+					if char then
+						for _, part in pairs(char:GetDescendants()) do
+							if part:IsA("BasePart") then
+								part.CanCollide = true
+							end
+						end
+						local hrp = char:FindFirstChild("HumanoidRootPart")
+						if hrp then
+							hrp.RotVelocity = Vector3.zero
+							hrp.Velocity = Vector3.zero
+							if originalPos then hrp.CFrame = originalPos end
+						end
+					end
+				end)
+			else
+				playerFlingActive = false
+				if flingBAV then flingBAV:Destroy() flingBAV = nil end
+				
+				local char = Player.Character
+				local hrp = char and char:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					hrp.RotVelocity = Vector3.zero
+					hrp.Velocity = Vector3.zero
+				end
+			end
+		end
+	})
+
+	_G.AutoSitBlobZ = true
+
+	BlobGroup:AddToggle("AutoSitZ", {
+		Text = "Auto Sit Blobman [Z]",
+		Default = true,
+		Callback = function(Value)
+			_G.AutoSitBlobZ = Value
+		end
+	})
