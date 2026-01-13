@@ -1,0 +1,34 @@
+MiscGroup:AddToggle("TPToggle", {
+		Text = "TP tool (T)",
+		Default = false,
+		Callback = function(Value)
+			if Value then
+				if tpToolConn then tpToolConn:Disconnect() end
+				tpToolConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+					if gameProcessed then return end
+					if input.KeyCode == Enum.KeyCode.T then
+						local character = Player.Character
+						if character and character:FindFirstChild("HumanoidRootPart") then
+							local hrp = character.HumanoidRootPart
+							local targetPos = mouse.Hit.Position
+							hrp.CFrame = CFrame.new(targetPos + Vector3.new(0,3,0))
+						end
+					end
+				end)
+			else
+				if tpToolConn then tpToolConn:Disconnect() tpToolConn = nil end
+			end
+		end
+	})
+
+	local waterParts = {}
+	task.spawn(function()
+		if workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("AlwaysHereTweenedObjects") then
+			local oceanModel = workspace.Map.AlwaysHereTweenedObjects.Ocean.Object.ObjectModel
+			for _, v in pairs(oceanModel:GetChildren()) do
+				if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("BasePart") or v:IsA("MeshPart") then
+				table.insert(waterParts, {part = v, originalCollide = v.CanCollide})
+				end
+			end
+		end
+	end)
