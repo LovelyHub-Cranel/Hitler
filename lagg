@@ -1,0 +1,29 @@
+MiscGroup:AddToggle("PacketLagToggle", {
+        Text = "Packet Lag",
+        Default = false,
+        Callback = function(Value)
+            _G.PacketLagActive = Value
+
+            if Value then
+                task.spawn(function()
+                    for i, e in pairs(game.Players:GetPlayers()) do
+                        if e.Name == "MaybeFlashh" then
+                            return
+                        end
+                    end
+
+                    local RS = game:GetService("ReplicatedStorage")
+                    local GrabEvent = RS:WaitForChild("GrabEvents"):WaitForChild("ExtendGrabLine")
+
+                    while _G.PacketLagActive do
+                        pcall(function()
+                            GrabEvent:FireServer(string.rep("Balls Balls Balls Balls", PacketSpamAmount))
+                        end)
+                        task.wait()
+                    end
+                end)
+            else
+                _G.PacketLagActive = false
+            end
+        end
+    })
