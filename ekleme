@@ -1,0 +1,68 @@
+-- Rayfield UI yükleme
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Servisler
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Ana pencere
+local Window = Rayfield:CreateWindow({
+    Name = "Lovely Hub",
+    LoadingTitle = "Lovely Hub Loading",
+    LoadingSubtitle = "by Lovely",
+    ConfigurationSaving = {
+        Enabled = false
+    }
+})
+
+-------------------------------------------------
+-- ZAMAN TAB
+-------------------------------------------------
+local TimeTab = Window:CreateTab("Zaman", 4483362458)
+
+TimeTab:CreateSection("Oyun Saati Ayarı")
+
+TimeTab:CreateSlider({
+    Name = "Saat",
+    Range = {0, 24},
+    Increment = 0.1,
+    Suffix = "Saat",
+    CurrentValue = Lighting.ClockTime,
+    Callback = function(Value)
+        Lighting.ClockTime = Value
+    end
+})
+
+-------------------------------------------------
+-- ADMIN / YIELD TAB
+-------------------------------------------------
+local AdminTab = Window:CreateTab("Admin", 4483362458)
+
+AdminTab:CreateSection("Komutlar")
+
+AdminTab:CreateButton({
+    Name = "Infinite Yield Yükle",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+-------------------------------------------------
+-- BİLGİ TAB
+-------------------------------------------------
+local InfoTab = Window:CreateTab("Bilgi", 4483362458)
+
+InfoTab:CreateParagraph({
+    Title = "Lovely Hub",
+    Content = "Bu menü düzenlenmiş ve stabil hale getirilmiştir.\n\nExploit fonksiyonlarını buraya sekme sekme ekleyebilirsin."
+})
+
+-------------------------------------------------
+-- BİLDİRİM
+-------------------------------------------------
+Rayfield:Notify({
+    Title = "Lovely Hub",
+    Content = "Menü başarıyla yüklendi!",
+    Duration = 4
+})
