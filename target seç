@@ -1,0 +1,26 @@
+-- TARGET DROPDOWN
+local function GetPlayers()
+    local list = {}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= Player then
+            table.insert(list, plr.Name)
+        end
+    end
+    return list
+end
+
+local TargetDropdown = TargetTab:CreateDropdown({
+    Name = "Target Seç",
+    Options = GetPlayers(),
+    CurrentOption = {},
+    Callback = function(opt)
+        selectedKickPlayer = Players:FindFirstChild(opt[1])
+    end
+})
+
+TargetTab:CreateButton({
+    Name = "Refresh Player List",
+    Callback = function()
+        TargetDropdown:Refresh(GetPlayers())
+    end
+})
