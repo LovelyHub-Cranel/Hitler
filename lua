@@ -3,7 +3,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- Pencere oluşturma
 local Window = Rayfield:CreateWindow({
-   Name = "Lovely-Hub,
+   Name = "Lovely-Hub",
    LoadingTitle = "Rayfield UI",
    LoadingSubtitle = "by Lovely",
    ConfigurationSaving = {
