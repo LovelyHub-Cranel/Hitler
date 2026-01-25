@@ -1,0 +1,63 @@
+-- Rayfield UI yükleme
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Ana pencere
+local Window = Rayfield:CreateWindow({
+    Name = "Lovely",
+    LoadingTitle = "Menü Yükleniyor",
+    LoadingSubtitle = "Rayfield UI",
+    ConfigurationSaving = {
+        Enabled = false
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
+})
+
+-- TAB 1
+local MainTab = Window:CreateTab("Ana Menü", 4483362458)
+
+-- Buton
+MainTab:CreateButton({
+    Name = "Mesaj At",
+    Callback = function()
+        print("Butona basıldı!")
+    end,
+})
+
+-- Toggle
+MainTab:CreateToggle({
+    Name = "Özellik Aç / Kapat",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        print("Toggle durumu:", Value)
+    end,
+})
+
+-- Slider
+MainTab:CreateSlider({
+    Name = "Hız Ayarı",
+    Range = {16, 100},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Flag = "SpeedSlider",
+    Callback = function(Value)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = Value
+        end
+    end,
+})
+
+-- TAB 2
+local ExtraTab = Window:CreateTab("Ekstra", 4483362458)
+
+ExtraTab:CreateButton({
+    Name = "Oyunu Kapat (Kick)",
+    Callback = function()
+        game.Players.LocalPlayer:Kick("Menüden çıkıldı")
+    end,
+})
