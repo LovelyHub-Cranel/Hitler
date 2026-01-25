@@ -1,0 +1,11 @@
+-- Window
+local Window = Rayfield:CreateWindow({
+    Name = "Blobman Menu",
+    LoadingTitle = "Loop Kick Menü",
+    LoadingSubtitle = "Rayfield UI",
+    ConfigurationSaving = { Enabled = false }
+})
+
+-- Tabs
+local TargetTab = Window:CreateTab("Target", 4483362458)
+local MainTab = Window:CreateTab("Main", 4483362458)
