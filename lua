@@ -5,7 +5,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
    Name = "Zaman Kontrol Paneli",
    LoadingTitle = "Rayfield UI",
-   LoadingSubtitle = "by ChatGPT 😎",
+   LoadingSubtitle = "by Lovely-End",
    ConfigurationSaving = {
       Enabled = false
    }
