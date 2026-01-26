@@ -1,0 +1,81 @@
+-- SERVICES
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = workspace
+local Camera = Workspace.CurrentCamera
+
+-- INFINITE YIELD
+loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"
+))()
+
+-- OBSIDIAN UI
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+Library.ForceCheckbox = false
+
+-- WINDOW
+local Window = Library:CreateWindow({
+    Title = "Lonely-Hub",
+    Footer = "Made by VaBlox",
+    NotifySide = "Right",
+    ShowCustomCursor = true,
+})
+
+-- TABS
+local Tabs = {
+    Defense = Window:AddTab("Defense", "shield"),
+    Target  = Window:AddTab("Target", "crosshair"),
+    Grab    = Window:AddTab("Grab", "hand"),
+    Player  = Window:AddTab("Player", "user"),
+    Misc    = Window:AddTab("Misc", "box"),
+    Build   = Window:AddTab("Build", "box"),
+    UI      = Window:AddTab("UI Settings", "settings"),
+}
+
+-- GAME OBJECTS
+local Player = Players.LocalPlayer
+local CharacterEvents = ReplicatedStorage:WaitForChild("CharacterEvents", 10)
+local BeingHeld = Player:WaitForChild("IsHeld", 10)
+local StruggleEvent = CharacterEvents and CharacterEvents:WaitForChild("Struggle")
+
+-- NOTIFY FUNCTION
+local function notify(title, content, duration)
+    Library:Notify({
+        Title = title or "Notification",
+        Description = content or "",
+        Time = duration or 5,
+    })
+end
+
+-- EXAMPLE UI ELEMENT (TEST)
+Tabs.Misc:AddButton("Test Notification", function()
+    notify("Lonely-Hub", "UI başarıyla yüklendi!", 4)
+end)
+
+-- UI SETTINGS
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+
+ThemeManager:SetFolder("LonelyHub")
+SaveManager:SetFolder("LonelyHub/configs")
+
+SaveManager:BuildConfigSection(Tabs.UI)
+ThemeManager:ApplyToTab(Tabs.UI)
+
+notify("Lonely-Hub", "Script Loaded Successfully", 5)
