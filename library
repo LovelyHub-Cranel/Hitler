@@ -16,7 +16,7 @@ local Players = game:GetService("Players")
 
 	local Window = Library:CreateWindow({
 		Title = "Lonely-Hub",
-		Footer = "Made by VaBlox",
+		Footer = "Made by Cranel",
 		NotifySide = "Right",
 		ShowCustomCursor = true,
 	})
