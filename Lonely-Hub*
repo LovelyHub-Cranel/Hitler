@@ -52,39 +52,28 @@ ocal Players = game:GetService("Players")
 		})
 	end
 
--- Services
-local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
 
-local Player = Players.LocalPlayer
+local player = Players.LocalPlayer
+local message = "Lovely-End"
 
--- Ayarlar
-local AUTO_CHAT_ENABLED = true
-local CHAT_INTERVAL = 5 -- saniye
-local MESSAGE = "Lonely-End"
+-- Oyuncu tamamen yüklenene kadar bekle
+repeat task.wait() until player
 
--- TextChannel (Genelde RBXGeneral)
-local function getDefaultChannel()
-	repeat task.wait() until TextChatService.ChatVersion == Enum.ChatVersion.TextChatService
-	return TextChatService.TextChannels:FindFirstChild("RBXGeneral")
+-- Yeni chat sistemi (TextChatService)
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+    local channel = TextChatService.TextChannels.RBXGeneral
+    if channel then
+        channel:SendAsync(message)
+    end
+else
+    -- Eski chat sistemi
+    game:GetService("ReplicatedStorage")
+        .DefaultChatSystemChatEvents
+        .SayMessageRequest
+        :FireServer(message, "All")
 end
-
-task.spawn(function()
-	local channel = getDefaultChannel()
-	if not channel then
-		warn("Chat channel bulunamadı!")
-		return
-	end
-
-	while AUTO_CHAT_ENABLED do
-		pcall(function()
-			channel:SendAsync(MESSAGE)
-		end)
-		task.wait(CHAT_INTERVAL)
-	end
-end)
-
-
 	local paintPartsBackup = {}
 	local paintConnections = {}
 	local function deleteAllPaintParts()
