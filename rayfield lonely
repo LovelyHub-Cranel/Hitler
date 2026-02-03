@@ -69,3 +69,25 @@ Rayfield:Notify({
     Content = "Panel başarıyla oluşturuldu",
     Duration = 3
 })
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+
+local player = Players.LocalPlayer
+local message = "Lovely-End"
+
+-- Oyuncu tamamen yüklenene kadar bekle
+repeat task.wait() until player
+
+-- Yeni chat sistemi (TextChatService)
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+    local channel = TextChatService.TextChannels.RBXGeneral
+    if channel then
+        channel:SendAsync(message)
+    end
+else
+    -- Eski chat sistemi
+    game:GetService("ReplicatedStorage")
+        .DefaultChatSystemChatEvents
+        .SayMessageRequest
+        :FireServer(message, "All")
+end
