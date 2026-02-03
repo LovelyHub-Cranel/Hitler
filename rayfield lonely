@@ -1,0 +1,71 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Lovely-Hub",
+    LoadingTitle = "Loading Menu",
+    LoadingSubtitle = "Rayfield UI",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = nil,
+        FileName = "MyMenuPanel"
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
+})
+
+-- MAIN TAB
+local MainTab = Window:CreateTab("Main", 4483362458)
+MainTab:CreateSection("Main Settings")
+
+MainTab:CreateToggle({
+    Name = "Example Toggle",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Main Toggle:", Value)
+    end
+})
+
+-- LOOP TAB
+local LoopTab = Window:CreateTab("Loop", 4483362458)
+LoopTab:CreateSection("Loop Features")
+
+LoopTab:CreateToggle({
+    Name = "Loop Example",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Loop Toggle:", Value)
+    end
+})
+
+-- DEFANCE TAB
+local DefanceTab = Window:CreateTab("Defance", 4483362458)
+DefanceTab:CreateSection("Defance Systems")
+
+DefanceTab:CreateToggle({
+    Name = "Auto Defance",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Defance Toggle:", Value)
+    end
+})
+
+-- AURA TAB
+local AuraTab = Window:CreateTab("Aura", 4483362458)
+AuraTab:CreateSection("Aura Features")
+
+AuraTab:CreateToggle({
+    Name = "Kill Aura",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Aura Toggle:", Value)
+    end
+})
+
+-- NOTIFICATION
+Rayfield:Notify({
+    Title = "Menu Ready",
+    Content = "Panel başarıyla oluşturuldu",
+    Duration = 3
+})
