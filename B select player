@@ -1,3 +1,24 @@
+Callback = function(playerNameToAdd)
+        if playerNameToAdd then
+            _G.PlayerToAdd = string.split(playerNameToAdd, " ")[1]
+        end
+    end
+})
+local unknownValue = nil
+local maxPlayersInLoop = GetKey() ~= "Xana" and 3 or 999999
+loopPlayersSection:AddButton({
+    Name = "Add",
+    Callback = function()
+        if not table.find(playerList, _G.PlayerToAdd) then
+            if maxPlayersInLoop <= # playerList then
+                showNotification("You reached the max ammount of players in loop, buy premium to unlock more space!")
+            else
+                table.insert(playerList, _G.PlayerToAdd)
+                refreshStringList(unknownValue, playerList)
+            end
+        end
+    end
+})
 local selectPlayerDropdown = loopPlayersSection:AddDropdown({
     Name = "Select Player",
     Default = "",
