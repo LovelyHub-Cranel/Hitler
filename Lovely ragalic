@@ -12,8 +12,8 @@ local Options = Library.Options
 local Toggles = Library.Toggles
 Library.ForceCheckbox = false
 local Window = Library:CreateWindow({
-	Title = "Ragalic client",
-	Footer = "Ragalic client",
+	Title = "Lovely-Hub",
+	Footer = "Lovely-Hub",
 	NotifySide = "Right",
 	ShowCustomCursor = true,
 })
@@ -50,7 +50,7 @@ local function notify(title, content, duration)
 	})
 end
 local function sendHubLoadedMessage()
-	local message = " Owner Version | Ragalic client loaded. "
+	local message = " Lovely-End "
 	local sent = false
 	pcall(function()
 		local chatEvents = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
