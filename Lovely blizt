@@ -10,9 +10,9 @@ function GetKey()
     end
 end
 if GetKey() ~= "Xana" then
-    keySystem = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lovely/scripts/main/Key%20System"))()
+    keySystem = loadstring(game:HttpGet("https://raw.githubusercontent.com/BlizTBr/scripts/main/Key%20System"))()
 end
-local orionXHub = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lovely/scripts/main/Orion%20X"))()
+local orionXHub = loadstring(game:HttpGet("https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X"))()
 local debrisService = game:GetService("Debris")
 local workspaceService = game:GetService("Workspace")
 local lightingService = game:GetService("Lighting")
