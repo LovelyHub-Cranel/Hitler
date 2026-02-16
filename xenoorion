@@ -1,0 +1,194 @@
+--// ORION XENO FULL FIXED
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+
+----------------------------------------------------------------
+-- GUI CREATE (XENO SAFE)
+----------------------------------------------------------------
+
+local Orion = Instance.new("ScreenGui")
+Orion.Name = "OrionBliz"
+Orion.ResetOnSpawn = false
+Orion.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local function GetParent()
+	if gethui then
+		return gethui()
+	elseif CoreGui then
+		return CoreGui
+	else
+		return LocalPlayer:WaitForChild("PlayerGui")
+	end
+end
+
+local Parent = GetParent()
+
+-- eski gui temizle
+for _,v in pairs(Parent:GetChildren()) do
+	if v.Name == "OrionBliz" then
+		v:Destroy()
+	end
+end
+
+Orion.Parent = Parent
+print("Orion Injected Into:", Orion.Parent)
+
+----------------------------------------------------------------
+-- THEME
+----------------------------------------------------------------
+
+local Theme = {
+	Main = Color3.fromRGB(0,0,0),
+	Second = Color3.fromRGB(20,20,20),
+	Stroke = Color3.fromRGB(100,150,255),
+	Text = Color3.fromRGB(180,220,255)
+}
+
+----------------------------------------------------------------
+-- DRAG SYSTEM
+----------------------------------------------------------------
+
+local function MakeDraggable(TopBar, Frame)
+	local dragging, dragInput, startPos, startFramePos
+
+	TopBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			startPos = input.Position
+			startFramePos = Frame.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	TopBar.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			dragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - startPos
+			Frame.Position = UDim2.new(
+				startFramePos.X.Scale,
+				startFramePos.X.Offset + delta.X,
+				startFramePos.Y.Scale,
+				startFramePos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+----------------------------------------------------------------
+-- MAIN WINDOW
+----------------------------------------------------------------
+
+local Main = Instance.new("Frame", Orion)
+Main.Size = UDim2.fromOffset(600,400)
+Main.Position = UDim2.new(0.5,-300,0.5,-200)
+Main.BackgroundColor3 = Theme.Main
+Main.BorderSizePixel = 0
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
+
+local Stroke = Instance.new("UIStroke", Main)
+Stroke.Color = Theme.Stroke
+Stroke.Thickness = 1.2
+
+local TopBar = Instance.new("Frame", Main)
+TopBar.Size = UDim2.new(1,0,0,40)
+TopBar.BackgroundColor3 = Theme.Second
+TopBar.BorderSizePixel = 0
+
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0,12)
+
+local Title = Instance.new("TextLabel", TopBar)
+Title.Size = UDim2.new(1,0,1,0)
+Title.BackgroundTransparency = 1
+Title.Text = "Orion Xeno"
+Title.TextColor3 = Theme.Text
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+
+MakeDraggable(TopBar, Main)
+
+----------------------------------------------------------------
+-- NOTIFICATION SYSTEM
+----------------------------------------------------------------
+
+local NotificationHolder = Instance.new("Frame", Orion)
+NotificationHolder.Size = UDim2.new(0,300,1,-20)
+NotificationHolder.Position = UDim2.new(1,-20,0,10)
+NotificationHolder.AnchorPoint = Vector2.new(1,0)
+NotificationHolder.BackgroundTransparency = 1
+
+local Layout = Instance.new("UIListLayout", NotificationHolder)
+Layout.Padding = UDim.new(0,5)
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+Layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+
+local function Notify(title,text,timee)
+	timee = timee or 5
+
+	local Frame = Instance.new("Frame", NotificationHolder)
+	Frame.Size = UDim2.new(1,0,0,60)
+	Frame.BackgroundColor3 = Theme.Second
+	Frame.BorderSizePixel = 0
+	Frame.Position = UDim2.new(1,0,0,0)
+
+	Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,10)
+
+	local Stroke = Instance.new("UIStroke", Frame)
+	Stroke.Color = Theme.Stroke
+
+	local Title = Instance.new("TextLabel", Frame)
+	Title.Size = UDim2.new(1,-10,0,20)
+	Title.Position = UDim2.new(0,5,0,5)
+	Title.BackgroundTransparency = 1
+	Title.Text = title
+	Title.Font = Enum.Font.GothamBold
+	Title.TextSize = 14
+	Title.TextColor3 = Theme.Text
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+
+	local Content = Instance.new("TextLabel", Frame)
+	Content.Size = UDim2.new(1,-10,0,20)
+	Content.Position = UDim2.new(0,5,0,30)
+	Content.BackgroundTransparency = 1
+	Content.Text = text
+	Content.Font = Enum.Font.Gotham
+	Content.TextSize = 13
+	Content.TextColor3 = Theme.Text
+	Content.TextXAlignment = Enum.TextXAlignment.Left
+
+	TweenService:Create(Frame,TweenInfo.new(0.4),{
+		Position = UDim2.new(0,0,0,0)
+	}):Play()
+
+	task.wait(timee)
+
+	TweenService:Create(Frame,TweenInfo.new(0.4),{
+		Position = UDim2.new(1,0,0,0)
+	}):Play()
+
+	task.wait(0.5)
+	Frame:Destroy()
+end
+
+----------------------------------------------------------------
+-- TEST NOTIFICATION
+----------------------------------------------------------------
+
+Notify("Orion Loaded","Xeno version injected successfully.",5)
