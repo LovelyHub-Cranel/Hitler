@@ -1,0 +1,177 @@
+--// ORION NORMAL UI
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+-- Remove old
+pcall(function()
+	if CoreGui:FindFirstChild("OrionUI") then
+		CoreGui.OrionUI:Destroy()
+	end
+end)
+
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "OrionUI"
+gui.Parent = CoreGui
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.fromOffset(650,420)
+main.Position = UDim2.new(0.5,-325,0.5,-210)
+main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
+
+-- Stroke
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(60,60,60)
+
+-- Topbar
+local top = Instance.new("Frame", main)
+top.Size = UDim2.new(1,0,0,45)
+top.BackgroundColor3 = Color3.fromRGB(35,35,35)
+top.BorderSizePixel = 0
+Instance.new("UICorner", top).CornerRadius = UDim.new(0,12)
+
+local title = Instance.new("TextLabel", top)
+title.Size = UDim2.new(1,0,1,0)
+title.BackgroundTransparency = 1
+title.Text = "Orion UI"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 17
+
+-- Drag
+local dragging, dragStart, startPos
+top.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Toggle (RightShift)
+UIS.InputBegan:Connect(function(input,gp)
+	if not gp and input.KeyCode == Enum.KeyCode.RightShift then
+		main.Visible = not main.Visible
+	end
+end)
+
+-- Tabs Frame
+local tabsFrame = Instance.new("Frame", main)
+tabsFrame.Size = UDim2.new(0,160,1,-45)
+tabsFrame.Position = UDim2.new(0,0,0,45)
+tabsFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+tabsFrame.BorderSizePixel = 0
+
+local tabsLayout = Instance.new("UIListLayout", tabsFrame)
+tabsLayout.Padding = UDim.new(0,5)
+
+-- Content Frame
+local contentFrame = Instance.new("Frame", main)
+contentFrame.Size = UDim2.new(1,-160,1,-45)
+contentFrame.Position = UDim2.new(0,160,0,45)
+contentFrame.BackgroundTransparency = 1
+
+local Tabs = {}
+
+local function CreateTab(name)
+	local tabButton = Instance.new("TextButton", tabsFrame)
+	tabButton.Size = UDim2.new(1,0,0,40)
+	tabButton.Text = name
+	tabButton.Font = Enum.Font.Gotham
+	tabButton.TextSize = 14
+	tabButton.TextColor3 = Color3.new(1,1,1)
+	tabButton.BackgroundColor3 = Color3.fromRGB(25,25,25)
+	tabButton.BorderSizePixel = 0
+	Instance.new("UICorner", tabButton)
+
+	local tabContent = Instance.new("ScrollingFrame", contentFrame)
+	tabContent.Size = UDim2.new(1,0,1,0)
+	tabContent.CanvasSize = UDim2.new(0,0,0,0)
+	tabContent.ScrollBarThickness = 4
+	tabContent.Visible = false
+	tabContent.BackgroundTransparency = 1
+
+	local layout = Instance.new("UIListLayout", tabContent)
+	layout.Padding = UDim.new(0,10)
+
+	layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		tabContent.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y + 10)
+	end)
+
+	tabButton.MouseButton1Click:Connect(function()
+		for _,t in pairs(Tabs) do
+			t.Content.Visible = false
+			t.Button.BackgroundColor3 = Color3.fromRGB(25,25,25)
+		end
+		tabContent.Visible = true
+		tabButton.BackgroundColor3 = Color3.fromRGB(0,170,255)
+	end)
+
+	local tab = {
+		Button = tabButton,
+		Content = tabContent
+	}
+
+	if #Tabs == 0 then
+		tabContent.Visible = true
+		tabButton.BackgroundColor3 = Color3.fromRGB(0,170,255)
+	end
+
+	table.insert(Tabs, tab)
+
+	return tab
+end
+
+-- Add Button Function
+local function AddButton(tab, text, callback)
+	local btn = Instance.new("TextButton", tab.Content)
+	btn.Size = UDim2.new(1,-10,0,35)
+	btn.Text = text
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 14
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	btn.BorderSizePixel = 0
+	Instance.new("UICorner", btn)
+
+	btn.MouseButton1Click:Connect(callback)
+end
+
+--// TEST UI
+
+local tab1 = CreateTab("Main")
+AddButton(tab1, "Test Button", function()
+	print("Buton çalıştı")
+end)
+
+local tab2 = CreateTab("Settings")
+AddButton(tab2, "Print Hello", function()
+	print("Hello")
+end)
+
+print("Orion UI Loaded")
