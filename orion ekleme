@@ -1,0 +1,16 @@
+local Window = OrionLib:MakeWindow({Name = "Xeno Script", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+local Tab = Window:MakeTab({
+	Name = "Ana Menü",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddButton({
+	Name = "Selam Ver!",
+	Callback = function()
+      		print("Merhaba Xeno kullanıcısı!")
+  	end    
+})
+
+OrionLib:Init() --
