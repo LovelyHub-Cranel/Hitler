@@ -1,0 +1,10 @@
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/BlizTBr/scripts/main/Orion%20X'))()
+local Window = OrionLib:MakeWindow({Name = 'Test Penceresi', HidePremium = false, SaveConfig = true, ConfigFolder = 'OrionTest'})
+
+Window:MakeTab({
+	Name = 'Ana Menü',
+	Icon = 'rbxassetid://4483345998',
+	PremiumOnly = false
+})
+
+OrionLib:Init()
