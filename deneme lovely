@@ -6268,6 +6268,8 @@ invulnerabilitySection:AddToggle({
 			end
 		end
 	end,
+    Save = true,
+    Flag = "antilag_toggle"
 })
 antikicktoggle = invulnerabilitySection:AddToggle({
     Name = "Anti-Kick",
@@ -6461,7 +6463,9 @@ antikicktoggle = invulnerabilitySection:AddToggle({
 			_G.ShurikenAntiKick = false
 			ClearKunai()
 		end
-	end
+	end,
+    Save = true,
+    Flag = "antikick_toggle"
 })
 playersCharFolder = Instance.new("Model", workspaceService)
 playersCharFolder.Name = "Characters"
