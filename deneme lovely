@@ -2759,7 +2759,7 @@ local function getLastBlobmanSeat()
 end
 local userInterface = orionXHub
 local flingThingsWindow = orionXHub.MakeWindow(userInterface, {
-    Name = "Fling Things and People",
+    Name = "Lovely-Hub",
     HidePremium = true,
     SaveConfig = true,
     ConfigFolder = "FTAPConfig",
