@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 
 local player = Players.LocalPlayer
-local message = "Lovely-End"
+local message = "Lovely-Hub"
 
 -- Oyuncu tamamen yüklenene kadar bekle
 repeat task.wait() until player
