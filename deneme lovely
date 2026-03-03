@@ -6197,7 +6197,7 @@ function antivoidmesssage()
                 Bubble_chat.Visible = true
                 BubbleTextchat.Visible = true
                 BubbleTextchat.Text = ""
-                local dialogueText = "I saved you from falling on the void, my son!"
+                local dialogueText = "Seni Anime Kızlarından Kurtardım"
                 for textIndex = 0, # dialogueText do
                     BubbleTextchat.Text = string.sub(dialogueText, 1, textIndex)
                     typingsoundeffect:Play()
