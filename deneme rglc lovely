@@ -532,37 +532,8 @@ DefenseGroup:AddToggle("AntiBurnToggle", {
 		end
 	end
 })
-local floppamessageoncooldown = false
-
-function antivoidmesssage()
-    if floppamessageoncooldown then return end
-    floppamessageoncooldown = true
-
-    local dialogueText = "Seni Anime Kızlarından Kurtardım"
-    local typedText = ""
-
-    -- Obsidian bildirimi başlat
-    local notification = Window:Notify({
-        Title = "Floppa",
-        Description = "",
-        Duration = 5 -- toplam süre (typing süresine göre ayarlayabilirsin)
-    })
-
-    -- Yazı yazma efekti
-    for i = 1, #dialogueText do
-        typedText = string.sub(dialogueText, 1, i)
-        notification:SetDescription(typedText) -- Obsidian'da dinamik text güncelleme
-        typingsoundeffect:Play()
-        task.wait(0.05)
-    end
-
-    task.wait(1)
-    typingsoundeffect2:Play()
-
-    floppamessageoncooldown = false
-end
 local antiVoidConn
-local VOID_THRESHOLD = -1000
+local VOID_THRESHOLD = -50
 local SAFE_HEIGHT = 100
 DefenseGroup:AddToggle("AntiVoidToggle", {
 	Text = "Anti Void",
@@ -580,9 +551,7 @@ DefenseGroup:AddToggle("AntiVoidToggle", {
 						local safePos = Vector3.new(pos.X, pos.Y + SAFE_HEIGHT, pos.Z)
 						char:SetPrimaryPartCFrame(CFrame.new(safePos))
 						char.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
-						antivoidmesssage()
 					end
-					wait((0.1))
 				end
 			end)
 		else
