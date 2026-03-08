@@ -1,0 +1,1062 @@
+-- Rayfield UI yükleme
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Pencere oluşturma
+local Window = Rayfield:CreateWindow({
+   Name = "Lovely-Hub",
+   LoadingTitle = "Rayfield UI",
+   LoadingSubtitle = "by Cranel",
+   ConfigurationSaving = {
+      Enabled = false
+   }
+})
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+
+local player = Players.LocalPlayer
+local message = "Lovely❤-Hub😜"
+
+-- Oyuncu tamamen yüklenene kadar bekle
+repeat task.wait() until player
+
+-- Yeni chat sistemi (TextChatService)
+if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+    local channel = TextChatService.TextChannels.RBXGeneral
+    if channel then
+        channel:SendAsync(message)
+    end
+else
+    -- Eski chat sistemi
+    game:GetService("ReplicatedStorage")
+        .DefaultChatSystemChatEvents
+        .SayMessageRequest
+        :FireServer(message, "All")
+end
+
+-- Tab oluşturma
+local Tab = Window:CreateTab("Zaman", 4483362458)
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+local TargetTab = Window:CreateTab("Target", 4483362458)
+
+local DefanceTab = Window:CreateTab("Defance", 4483362458)
+
+local FunTab = Window:CreateTab("Fun", 4483362458)
+
+
+
+-- Slider ile saat ayarlama
+Tab:CreateSlider({
+   Name = "Oyun Saati",
+   Range = {0, 24},
+   Increment = 0.1,
+   Suffix = "Saat",
+   CurrentValue = game:GetService("Lighting").ClockTime,
+   Flag = "TimeSlider",
+   Callback = function(Value)
+       game:GetService("Lighting").ClockTime = Value
+   end,
+})
+-- CONFIG
+local GucciConfig = {
+    enabled = false,
+    isSitting = false,
+    ragdollConn = nil
+}
+
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local LP = Players.LocalPlayer
+
+local function runGucciSetup()
+
+    local Char = LP.Character or LP.CharacterAdded:Wait()
+    local Hum = Char:WaitForChild("Humanoid")
+    local HRP = Char:WaitForChild("HumanoidRootPart")
+
+    local OldPos = HRP.Position
+
+    -- Spawn Blobman
+    pcall(function()
+        RS.MenuToys.SpawnToyRemoteFunction:InvokeServer(
+            "CreatureBlobman",
+            CFrame.new(0,50000,0),
+            Vector3.new(0,60,0)
+        )
+    end)
+
+    -- Toy spawn bekleme
+    local toyFolder = workspace:WaitForChild(LP.Name.."SpawnedInToys",5)
+    if not toyFolder then return end
+
+    local bman = toyFolder:WaitForChild("CreatureBlobman",5)
+    if not bman then return end
+
+    local head = bman:FindFirstChild("Head")
+    local seat = bman:FindFirstChildWhichIsA("VehicleSeat")
+
+    if head then
+        head.CFrame = CFrame.new(0,50000,0)
+        head.Anchored = true
+    end
+
+    if seat then
+        HRP.CFrame = seat.CFrame + Vector3.new(0,2,0)
+        task.wait(0.05)
+        seat:Sit(Hum)
+        GucciConfig.isSitting = true
+    end
+
+    -- Jump ile geri dönme
+    Hum:GetPropertyChangedSignal("Jump"):Connect(function()
+        if GucciConfig.isSitting and Hum.Jump then
+            HRP.CFrame = CFrame.new(OldPos)
+            GucciConfig.isSitting = false
+        end
+    end)
+
+    -- Loop
+    if GucciConfig.ragdollConn then
+        GucciConfig.ragdollConn:Disconnect()
+    end
+
+    GucciConfig.ragdollConn = RunService.Heartbeat:Connect(function()
+        if GucciConfig.enabled and GucciConfig.isSitting then
+            pcall(function()
+                RS.CharacterEvents.RagdollRemote:FireServer(HRP,0)
+            end)
+        end
+    end)
+
+end
+
+
+-- RAYFIELD TOGGLE
+DefanceTab:CreateToggle({
+    Name = "Gucci",
+    CurrentValue = false,
+    Flag = "gucci_toggle",
+    Callback = function(Value)
+
+        GucciConfig.enabled = Value
+
+        if Value then
+            runGucciSetup()
+        else
+            if GucciConfig.ragdollConn then
+                GucciConfig.ragdollConn:Disconnect()
+                GucciConfig.ragdollConn = nil
+            end
+            GucciConfig.isSitting = false
+        end
+
+    end
+})
+DefanceTab:CreateToggle({
+    Name = "Anti-Grab",
+    CurrentValue = false,
+    Flag = "antigrab_toggle", 
+    Callback = function(Value)
+		local RunService = game:GetService("RunService")
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local localPlayer = game:GetService("Players").LocalPlayer
+		local Struggle = ReplicatedStorage:FindFirstChild("CharacterEvents") and ReplicatedStorage.CharacterEvents:FindFirstChild("Struggle")
+		if Value then
+			if autoStruggleConn then
+				autoStruggleConn:Disconnect()
+			end
+			autoStruggleConn = RunService.Heartbeat:Connect(function()
+				local character = localPlayer.Character
+				if character and character:FindFirstChild("Head") then
+					local head = character.Head
+					if head:FindFirstChild("PartOwner") then
+						task.spawn(function()
+							if Struggle then
+								Struggle:FireServer(localPlayer)
+							end
+							pcall(function()
+								ReplicatedStorage.GameCorrectionEvents.StopAllVelocity:FireServer()
+							end)
+							for _, part in pairs(character:GetChildren()) do
+								if part:IsA("BasePart") then
+									part.Anchored = true
+								end
+							end
+							local isHeld = localPlayer:FindFirstChild("IsHeld")
+							while isHeld and isHeld.Value do
+								task.wait()
+							end
+							for _, part in pairs(character:GetChildren()) do
+								if part:IsA("BasePart") then
+									part.Anchored = false
+								end
+							end
+						end)
+					end
+				end
+			end)
+		else
+			if autoStruggleConn then
+				autoStruggleConn:Disconnect()
+				autoStruggleConn = nil
+			end
+			local char = localPlayer.Character
+			if char then
+				for _, part in pairs(char:GetChildren()) do
+					if part:IsA("BasePart") then
+						part.Anchored = false
+					end
+				end
+			end
+		end
+	end
+})
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local dialogueParent = player:WaitForChild("PlayerGui")
+
+local floppadialogo = Instance.new("ScreenGui")
+local Floppa = Instance.new("ImageLabel")
+local Bubble_chat = Instance.new("ImageLabel")
+local BubbleTextchat = Instance.new("TextLabel")
+
+local typingsoundeffect = Instance.new("Sound", workspace)
+local typingsoundeffect2 = Instance.new("Sound", workspace)
+
+typingsoundeffect.SoundId = "rbxassetid://9120299506"
+typingsoundeffect.Volume = 0.345
+
+typingsoundeffect2.SoundId = "rbxassetid://9118870964"
+typingsoundeffect2.Volume = 1
+typingsoundeffect2.PlaybackSpeed = 1.5
+
+floppadialogo.Parent = dialogueParent
+floppadialogo.Name = "floppadialogo"
+floppadialogo.DisplayOrder = 10
+floppadialogo.Enabled = false
+floppadialogo.ResetOnSpawn = false
+
+-- Character
+
+Floppa.Parent = floppadialogo
+Floppa.BackgroundTransparency = 1
+Floppa.Image = "rbxthumb://type=Asset&id=16765815633&w=420&h=420"
+Floppa.Size = UDim2.new(0.19,0,0.30,0)
+Floppa.Position = UDim2.new(0.02,0,2,0)
+
+-- Chat bubble
+
+Bubble_chat.Parent = Floppa
+Bubble_chat.BackgroundTransparency = 1
+Bubble_chat.Image = "rbxassetid://1395860348"
+Bubble_chat.Size = UDim2.new(1.03,0,0.79,0)
+Bubble_chat.Position = UDim2.new(0.68,0,-0.29,0)
+
+-- Text
+
+BubbleTextchat.Parent = Bubble_chat
+BubbleTextchat.BackgroundTransparency = 1
+BubbleTextchat.TextScaled = true
+BubbleTextchat.TextWrapped = true
+BubbleTextchat.TextColor3 = Color3.new(0,0,0)
+BubbleTextchat.Font = Enum.Font.SourceSans
+BubbleTextchat.Size = UDim2.new(0.63,0,0.26,0)
+BubbleTextchat.Position = UDim2.new(0.18,0,0.36,0)
+BubbleTextchat.Text = ""
+
+-- Tween
+
+local tweenInfo = TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.In)
+
+local floppatween = TweenService:Create(
+    Floppa,
+    tweenInfo,
+    {Position = UDim2.new(0.02,0,0.66,0)}
+)
+
+local floppamessageoncooldown = false
+
+function antivoidmesssage()
+
+    if not floppamessageoncooldown then
+
+        Floppa.Position = UDim2.new(0.02,0,2,0)
+
+        floppadialogo.Enabled = true
+        Bubble_chat.Visible = false
+        BubbleTextchat.Visible = false
+
+        floppamessageoncooldown = true
+
+        floppatween:Play()
+
+        floppatween.Completed:Connect(function()
+
+            Bubble_chat.Visible = true
+            BubbleTextchat.Visible = true
+
+            local dialogueText = "Seni Anime Kızlarından Kurtardım"
+
+            for i = 1,#dialogueText do
+                BubbleTextchat.Text = string.sub(dialogueText,1,i)
+                typingsoundeffect:Play()
+                task.wait(0.05)
+            end
+
+            task.wait(3)
+
+            typingsoundeffect2:Play()
+
+            floppadialogo.Enabled = false
+            floppamessageoncooldown = false
+
+        end)
+
+    end
+end
+local Player = game.Players.LocalPlayer
+local R = game:GetService("RunService")
+
+local antiVoidConn
+local VOID_THRESHOLD = -50
+local SAFE_HEIGHT = 100
+
+DefanceTab:CreateToggle({
+    Name = "Anti-Void",
+    CurrentValue = false,
+    Flag = "antivoid_toggle",
+
+    Callback = function(on)
+
+        if on then
+
+            if antiVoidConn then
+                antiVoidConn:Disconnect()
+            end
+
+            antiVoidConn = R.Heartbeat:Connect(function()
+
+                local char = Player.Character
+                if char then
+
+                    local root = char:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+                        local pos = root.Position
+
+                        if pos.Y < VOID_THRESHOLD then
+
+                            local safePos = Vector3.new(pos.X, pos.Y + SAFE_HEIGHT, pos.Z)
+
+                            root.CFrame = CFrame.new(safePos)
+                            root.AssemblyLinearVelocity = Vector3.zero
+                            
+                           antivoidmesssage()
+                        end
+                    end
+                end
+            end)
+
+        else
+
+            if antiVoidConn then
+                antiVoidConn:Disconnect()
+                antiVoidConn = nil
+                
+            end
+        end
+    end
+})
+-- Değişkenler
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local createGrabLineCopy
+local extendGrabLineCopy
+
+-- İlk başta yedek al
+local grabFolder = ReplicatedStorage:FindFirstChild("GrabEvents")
+if grabFolder then
+	local create = grabFolder:FindFirstChild("CreateGrabLine")
+	local extend = grabFolder:FindFirstChild("ExtendGrabLine")
+
+	if create then
+		createGrabLineCopy = create:Clone()
+	end
+
+	if extend then
+		extendGrabLineCopy = extend:Clone()
+	end
+end
+
+
+-- Rayfield Toggle
+DefanceTab:CreateToggle({
+	Name = "Anti Lag",
+	CurrentValue = false,
+	Flag = "AntiLagToggle",
+	Callback = function(Value)
+
+		local grabFolder = ReplicatedStorage:FindFirstChild("GrabEvents")
+
+		if Value then
+			-- Lag yapan remote'ları kaldır
+			if grabFolder then
+				local create = grabFolder:FindFirstChild("CreateGrabLine")
+				local extend = grabFolder:FindFirstChild("ExtendGrabLine")
+
+				if create and create:IsA("RemoteEvent") then
+					create:Destroy()
+				end
+
+				if extend and extend:IsA("RemoteEvent") then
+					extend:Destroy()
+				end
+			end
+
+			-- Workspace içindeki beam / line temizleme
+			for _,v in ipairs(workspace:GetDescendants()) do
+				if v:IsA("Beam") or string.find(string.lower(v.Name),"line") then
+					v:Destroy()
+				end
+			end
+
+		else
+			-- Geri yükle
+			if grabFolder then
+				if createGrabLineCopy and not grabFolder:FindFirstChild("CreateGrabLine") then
+					createGrabLineCopy:Clone().Parent = grabFolder
+				end
+
+				if extendGrabLineCopy and not grabFolder:FindFirstChild("ExtendGrabLine") then
+					extendGrabLineCopy:Clone().Parent = grabFolder
+				end
+			end
+		end
+
+	end,
+})
+DefanceTab:CreateToggle({
+	Name = "Anti Input Lag",
+	CurrentValue = false,
+	Flag = "AntiInputLag",
+	Callback = function(Value)
+
+		if Value then
+			_G.AntiInputLag = true
+
+			task.spawn(function()
+
+				local plr = game.Players.LocalPlayer
+				local char = plr.Character or plr.CharacterAdded:Wait()
+				local hrp = char:WaitForChild("HumanoidRootPart")
+
+				local ToyName = "FoodHamburger"
+				local RS = game:GetService("ReplicatedStorage")
+				local Workspace = game:GetService("Workspace")
+				local RunService = game:GetService("RunService")
+
+				local SpawnRemote = RS.MenuToys.SpawnToyRemoteFunction
+
+				while _G.AntiInputLag do
+
+					local toysFolder = Workspace:FindFirstChild(plr.Name.."SpawnedInToys")
+					local burger = toysFolder and toysFolder:FindFirstChild(ToyName)
+
+					if not burger then
+						task.spawn(function()
+							pcall(function()
+								local spawnCF = hrp.CFrame * CFrame.new(0,5,0)
+								SpawnRemote:InvokeServer(ToyName,spawnCF,Vector3.new(0,0,0))
+							end)
+						end)
+
+						local startWait = tick()
+
+						repeat
+							RunService.Heartbeat:Wait()
+							toysFolder = Workspace:FindFirstChild(plr.Name.."SpawnedInToys")
+							burger = toysFolder and toysFolder:FindFirstChild(ToyName)
+						until burger or tick()-startWait > 1 or not _G.AntiInputLag
+					end
+
+					if burger and burger.Parent then
+						local holdPart = burger:FindFirstChild("HoldPart")
+
+						if holdPart then
+
+							local holdingPlayer = holdPart:FindFirstChild("HoldingPlayer")
+							holdingPlayer = holdingPlayer and holdingPlayer.Value
+
+							if holdingPlayer and holdingPlayer ~= plr then
+
+								pcall(function()
+									holdPart.DropItemRemoteFunction:InvokeServer(
+										burger,
+										hrp.CFrame * CFrame.new(0,2000,0),
+										Vector3.new(0,0,0)
+									)
+								end)
+
+								burger:Destroy()
+
+							else
+
+								pcall(function()
+									holdPart.HoldItemRemoteFunction:InvokeServer(burger,char)
+								end)
+
+								task.wait()
+
+								pcall(function()
+									holdPart.DropItemRemoteFunction:InvokeServer(
+										burger,
+										hrp.CFrame * CFrame.new(0,2000,0),
+										Vector3.new(0,0,0)
+									)
+								end)
+
+								task.wait()
+
+							end
+						end
+					end
+
+					RunService.Heartbeat:Wait()
+
+				end
+
+			end)
+
+		else
+			_G.AntiInputLag = false
+		end
+
+	end
+})
+local tpActive = false
+DefanceTab:CreateToggle({
+	Name = "Anti Kick",
+	CurrentValue = false,
+	Flag = "ShurikenAntiKick",
+	Callback = function(Value)
+		_G.ShurikenAntiKick = Value
+		local function ClearKunai()
+			local plr = game.Players.LocalPlayer
+			local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+			local destroyrem = game.ReplicatedStorage:FindFirstChild("MenuToys") and game.ReplicatedStorage.MenuToys:FindFirstChild("DestroyToy")
+			if inv and destroyrem then
+				for _, v in pairs(inv:GetChildren()) do
+					if v.Name == "AntiKick" or v.Name == "NinjaShuriken" then
+						pcall(function()
+							destroyrem:FireServer(v)
+						end)
+					end
+				end
+			end
+		end
+		if Value then
+			task.spawn(function()
+				local plr = game.Players.LocalPlayer
+				local ReplicatedStorage = game:GetService("ReplicatedStorage")
+				local setOwner = ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
+				local stickyEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
+				local spawnRemote = ReplicatedStorage.MenuToys.SpawnToyRemoteFunction
+				local destroyrem = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("DestroyToy")
+				local canSpawn = plr:WaitForChild("CanSpawnToy")
+				local function getHRP()
+					if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+						return plr.Character.HumanoidRootPart
+					else
+						local character = plr.CharacterAdded:Wait()
+						return character:WaitForChild("HumanoidRootPart")
+					end
+				end
+				local function CheckForHome()
+					if not workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+						return false
+					end
+					for _, v in pairs(workspace.Plots:GetChildren()) do
+						local sign = v:FindFirstChild("PlotSign")
+						local owners = sign and sign:FindFirstChild("ThisPlotsOwners")
+						if owners then
+							for _, b in pairs(owners:GetChildren()) do
+								if b.Value == plr.Name then
+									local folder = workspace.PlotItems:FindFirstChild(v.Name)
+									if folder then
+										return true, folder
+									end
+								end
+							end
+						end
+					end
+					return false
+				end
+				local function StickKunai(kunai)
+					if not kunai or not kunai:FindFirstChild("StickyPart") then
+						return
+					end
+					local currentHRP = getHRP()
+					if not currentHRP then
+						return
+					end
+					if kunai:FindFirstChild("SoundPart") then
+						if not kunai.SoundPart:FindFirstChild("PartOwner") or kunai.SoundPart.PartOwner.Value ~= plr.Name then
+							setOwner:FireServer(kunai.SoundPart, kunai.SoundPart.CFrame)
+						end
+					end
+					local firePart = currentHRP:FindFirstChild("FirePlayerPart") or currentHRP:WaitForChild("FirePlayerPart", 5)
+					if firePart then
+						stickyEvent:FireServer(
+								kunai.StickyPart,
+								firePart,
+								CFrame.new(0, 0, 0) * CFrame.Angles(0, math.rad(90), math.rad(90))
+							)
+					end
+					for _, obj in pairs(kunai:GetChildren()) do
+						if obj.Name == "Pyramid" then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 0
+							if not obj:FindFirstChild("Highlight") then
+								local high = Instance.new("Highlight", obj)
+								high.FillColor = Color3.fromRGB(0, 0, 0)
+							end
+						elseif obj.Name == "Main" then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 0
+							if not obj:FindFirstChild("Highlight") then
+								local high = Instance.new("Highlight", obj)
+								high.FillColor = Color3.fromRGB(255, 255, 255)
+							end
+						elseif obj:IsA("BasePart") then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 1
+						end
+					end
+				end
+				local function SpawnToy(name)
+					local t = tick()
+					while not canSpawn.Value do
+						if not _G.ShurikenAntiKick or tick() - t > 5 then
+							return nil
+						end
+						task.wait(0.1)
+					end
+					local currentHRP = getHRP()
+					if currentHRP then
+						task.spawn(function()
+							pcall(function()
+								spawnRemote:InvokeServer(name, currentHRP.CFrame * CFrame.new(0, 12, 20), Vector3.new(0, 0, 0))
+							end)
+						end)
+					end
+					local boolik, house = CheckForHome()
+					local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+					if boolik and house then
+						return house:WaitForChild(name, 2)
+					elseif not workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) and inv then
+						return inv:WaitForChild(name, 2)
+					end
+					return nil
+				end
+				while _G.ShurikenAntiKick do
+					task.wait(0.005)
+					if not plr.Character or not plr.Character:FindFirstChild("Humanoid") or plr.Character.Humanoid.Health <= 0 then
+						continue
+					end
+					local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+					local kunai = inv and inv:FindFirstChild("NinjaShuriken")
+					if workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+						local boolik, house = CheckForHome()
+						if boolik and house and workspace.Plots:FindFirstChild(house.Name) then
+							local sign = workspace.Plots[house.Name]:FindFirstChild("PlotSign")
+							if sign and sign.ThisPlotsOwners.Value.TimeRemainingNum.Value > 89 then
+								kunai = SpawnToy("NinjaShuriken")
+								if kunai == nil then
+									continue
+								end
+								kunai.Name = "AntiKick"
+								StickKunai(kunai)
+							end
+						end
+					end
+					if not kunai then
+						if workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+							continue
+						end
+						kunai = SpawnToy("NinjaShuriken")
+						if kunai == nil then
+							continue
+						end
+						kunai.Name = "AntiKick"
+						if not kunai then
+							continue
+						end
+					end
+					repeat
+						if kunai and kunai:FindFirstChild("StickyPart") and kunai.StickyPart.CanTouch == true then
+							StickKunai(kunai)
+							kunai.Name = "AntiKick"
+						end
+						task.wait(0.3)
+					until not kunai or not _G.ShurikenAntiKick
+							or not kunai:FindFirstChild("StickyPart")
+							or kunai.StickyPart.CanTouch == false 
+							or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") 
+							or not kunai:FindFirstChild("StickyPart") 
+							or (plr.Character.HumanoidRootPart.Position - kunai.StickyPart.Position).Magnitude >= 20
+					if not kunai or not kunai:FindFirstChild("StickyPart") or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or (plr.Character.HumanoidRootPart.Position - kunai.StickyPart.Position).Magnitude >= 20 then
+						ClearKunai()
+					end
+					pcall(function()
+						repeat
+							task.wait(0.05)
+						until not _G.ShurikenAntiKick or not plr.Character or not plr.Character:FindFirstChild("Humanoid") or not kunai or not kunai:FindFirstChild("StickyPart") or not kunai.StickyPart:FindFirstChild("StickyWeld") or not kunai.StickyPart.StickyWeld.Part1
+						if not kunai or not kunai:FindFirstChild("StickyPart") or (plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health <= 0) or not kunai["StickyPart"]:FindFirstChild("StickyWeld").Part1 then
+							ClearKunai()
+						end
+					end)
+				end
+			end)
+		else
+			_G.ShurikenAntiKick = false
+			ClearKunai()
+		end
+	end
+})
+
+-- KATANA ANTI V5.2
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local plr = Players.LocalPlayer
+local spawnRemote = ReplicatedStorage.MenuToys.SpawnToyRemoteFunction
+local stickyEvent = ReplicatedStorage.PlayerEvents.StickyPartEvent
+local setOwner = ReplicatedStorage.GrabEvents.SetNetworkOwner
+
+_G.KatanaAnti = _G.KatanaAnti or false
+
+local function getHRP()
+	local char = plr.Character or plr.CharacterAdded:Wait()
+	return char:WaitForChild("HumanoidRootPart")
+end
+
+local function getInventory()
+	return workspace:FindFirstChild(plr.Name.."SpawnedInToys")
+end
+
+local function getKatana()
+	local inv = getInventory()
+	if not inv then return end
+	return inv:FindFirstChild("Anti") or inv:FindFirstChild("NinjaKatana")
+end
+
+local function spawnKatana()
+	local hrp = getHRP()
+	pcall(function()
+		spawnRemote:InvokeServer(
+			"NinjaKatana",
+			hrp.CFrame * CFrame.new(0,0,20),
+			Vector3.new(0,0,0)
+		)
+	end)
+end
+
+local function forceOwner(katana)
+	local sound = katana:FindFirstChild("SoundPart")
+	if sound then
+		pcall(function()
+			setOwner:FireServer(sound, sound.CFrame)
+		end)
+	end
+end
+
+local function stickKatana(katana)
+
+	local sticky = katana:FindFirstChild("StickyPart")
+	local hrp = getHRP()
+	local firePart = hrp:FindFirstChild("FirePlayerPart")
+
+	if sticky and firePart then
+		pcall(function()
+			stickyEvent:FireServer(
+				sticky,
+				firePart,
+				CFrame.new() * CFrame.Angles(0,math.rad(90),math.rad(90))
+			)
+		end)
+	end
+
+end
+
+local function protectParts(katana)
+
+	for _,v in pairs(katana:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanTouch = false
+			v.CanCollide = false
+			v.CanQuery = false
+		end
+	end
+
+end
+
+task.spawn(function()
+
+	while task.wait(0.05) do
+
+		if not _G.KatanaAnti then
+			continue
+		end
+
+		local char = plr.Character
+		if not char then
+			continue
+		end
+
+		local hum = char:FindFirstChild("Humanoid")
+		if not hum or hum.Health <= 0 then
+			continue
+		end
+
+		local katana = getKatana()
+
+		if not katana then
+			spawnKatana()
+			continue
+		end
+
+		katana.Name = "Anti"
+
+		local sticky = katana:FindFirstChild("StickyPart")
+
+		if sticky then
+
+			local weld = sticky:FindFirstChild("StickyWeld")
+
+			if not weld or sticky.CanTouch then
+				stickKatana(katana)
+			end
+
+			if (getHRP().Position - sticky.Position).Magnitude > 15 then
+				stickKatana(katana)
+			end
+
+		end
+
+		forceOwner(katana)
+
+		protectParts(katana)
+
+	end
+
+end)
+local tpActive = false
+DefanceTab:CreateToggle({
+	Name = "Anti 2.0",
+	CurrentValue = false,
+	Flag = "KatanaAnti",
+	Callback = function(Value)
+		_G.KatanaAnti = Value
+		local function ClearKatana()
+			local plr = game.Players.LocalPlayer
+			local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+			local destroyrem = game.ReplicatedStorage:FindFirstChild("MenuToys") and game.ReplicatedStorage.MenuToys:FindFirstChild("DestroyToy")
+			if inv and destroyrem then
+				for _, v in pairs(inv:GetChildren()) do
+					if v.Name == "Anti" or v.Name == "NinjaKatana" then
+						pcall(function()
+							destroyrem:FireServer(v)
+						end)
+					end
+				end
+			end
+		end
+		if Value then
+			task.spawn(function()
+				local plr = game.Players.LocalPlayer
+				local ReplicatedStorage = game:GetService("ReplicatedStorage")
+				local setOwner = ReplicatedStorage:WaitForChild("GrabEvents"):WaitForChild("SetNetworkOwner")
+				local stickyEvent = ReplicatedStorage:WaitForChild("PlayerEvents"):WaitForChild("StickyPartEvent")
+				local spawnRemote = ReplicatedStorage.MenuToys.SpawnToyRemoteFunction
+				local destroyrem = ReplicatedStorage:WaitForChild("MenuToys"):WaitForChild("DestroyToy")
+				local canSpawn = plr:WaitForChild("CanSpawnToy")
+				local function getHRP()
+					if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+						return plr.Character.HumanoidRootPart
+					else
+						local character = plr.CharacterAdded:Wait()
+						return character:WaitForChild("HumanoidRootPart")
+					end
+				end
+				local function CheckForHome()
+					if not workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+						return false
+					end
+					for _, v in pairs(workspace.Plots:GetChildren()) do
+						local sign = v:FindFirstChild("PlotSign")
+						local owners = sign and sign:FindFirstChild("ThisPlotsOwners")
+						if owners then
+							for _, b in pairs(owners:GetChildren()) do
+								if b.Value == plr.Name then
+									local folder = workspace.PlotItems:FindFirstChild(v.Name)
+									if folder then
+										return true, folder
+									end
+								end
+							end
+						end
+					end
+					return false
+				end
+				local function StickKatana(katana)
+					if not katana or not katana:FindFirstChild("StickyPart") then
+						return
+					end
+					local currentHRP = getHRP()
+					if not currentHRP then
+						return
+					end
+					if katana:FindFirstChild("SoundPart") then
+						if not katana.SoundPart:FindFirstChild("PartOwner") or katana.SoundPart.PartOwner.Value ~= plr.Name then
+							setOwner:FireServer(katana.SoundPart, katana.SoundPart.CFrame)
+						end
+					end
+					local firePart = currentHRP:FindFirstChild("FirePlayerPart") or currentHRP:WaitForChild("FirePlayerPart", 5)
+					if firePart then
+						stickyEvent:FireServer(
+								katana.StickyPart,
+								firePart,
+								CFrame.new(0, 0, 0) * CFrame.Angles(0, math.rad(90), math.rad(90))
+							)
+					end
+					for _, obj in pairs(katana:GetChildren()) do
+						if obj.Name == "Pyramid" then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 0
+							if not obj:FindFirstChild("Highlight") then
+								local high = Instance.new("Highlight", obj)
+								high.FillColor = Color3.fromRGB(0, 0, 0)
+							end
+						elseif obj.Name == "Main" then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 0
+							if not obj:FindFirstChild("Highlight") then
+								local high = Instance.new("Highlight", obj)
+								high.FillColor = Color3.fromRGB(124, 213, 133)
+							end
+						elseif obj:IsA("BasePart") then
+							obj.CanTouch = false;
+							obj.CanCollide = false;
+							obj.CanQuery = false;
+							obj.Transparency = 1
+						end
+					end
+				end
+				local function SpawnToy(name)
+					local t = tick()
+					while not canSpawn.Value do
+						if not _G.KatanaAnti or tick() - t > 1 then
+							return nil
+						end
+						task.wait(0.1)
+					end
+					local currentHRP = getHRP()
+					if currentHRP then
+						task.spawn(function()
+							pcall(function()
+								spawnRemote:InvokeServer(name, currentHRP.CFrame * CFrame.new(0, 0, 20), Vector3.new(0, 0, 0))
+							end)
+						end)
+					end
+					local boolik, house = CheckForHome()
+					local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+					if boolik and house then
+						return house:WaitForChild(name, 2)
+					elseif not workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) and inv then
+						return inv:WaitForChild(name, 2)
+					end
+					return nil
+				end
+				while _G.KatanaAnti do
+					task.wait(0.005)
+					if not plr.Character or not plr.Character:FindFirstChild("Humanoid") or plr.Character.Humanoid.Health <= 0 then
+						continue
+					end
+					local inv = workspace:FindFirstChild(plr.Name .. "SpawnedInToys")
+					local katana = inv and inv:FindFirstChild("NinjaKatana")
+					if workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+						local boolik, house = CheckForHome()
+						if boolik and house and workspace.Plots:FindFirstChild(house.Name) then
+							local sign = workspace.Plots[house.Name]:FindFirstChild("PlotSign")
+							if sign and sign.ThisPlotsOwners.Value.TimeRemainingNum.Value > 89 then
+								katana = SpawnToy("NinjaKatana")
+								if katana == nil then
+									continue
+								end
+								katana.Name = "Anti"
+								StickKatana(katana)
+							end
+						end
+					end
+					if not katana then
+						if workspace.PlotItems.PlayersInPlots:FindFirstChild(plr.Name) then
+							continue
+						end
+						katana = SpawnToy("NinjaKatana")
+						if katana == nil then
+							continue
+						end
+						katana.Name = "Anti"
+						if not katana then
+							continue
+						end
+					end
+					repeat
+						if katana and katana:FindFirstChild("StickyPart") and katana.StickyPart.CanTouch == true then
+							StickKatana(katana)
+							katana.Name = "Anti"
+						end
+						task.wait(0.3)
+					until not katana or not _G.KatanaAnti
+							or not katana:FindFirstChild("StickyPart")
+							or katana.StickyPart.CanTouch == false 
+							or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") 
+							or not katana:FindFirstChild("StickyPart") 
+							or (plr.Character.HumanoidRootPart.Position - katana.StickyPart.Position).Magnitude >= 20
+					if not katana or not katana:FindFirstChild("StickyPart") or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") or (plr.Character.HumanoidRootPart.Position - katana.StickyPart.Position).Magnitude >= 20 then
+						ClearKatana()
+					end
+					pcall(function()
+						repeat
+							task.wait(0.05)
+						until not _G.KatanaAnti or not plr.Character or not plr.Character:FindFirstChild("Humanoid") or not katana or not katana:FindFirstChild("StickyPart") or not katana.StickyPart:FindFirstChild("StickyWeld") or not katana.StickyPart.StickyWeld.Part1
+						if not katana or not katana:FindFirstChild("StickyPart") or (plr.Character and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health <= 0) or not katana["StickyPart"]:FindFirstChild("StickyWeld").Part1 then
+							ClearKatana()
+						end
+					end)
+				end
+			end)
+		else
+			_G.KatanaAnti = false
+			ClearKatana()
+		end
+	end
+})
